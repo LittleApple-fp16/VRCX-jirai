@@ -71,7 +71,6 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
     const vrcRegistryAutoBackup = ref(true);
     const vrcRegistryAskRestore = ref(true);
     const sentryErrorReporting = ref(false);
-    const autoJoinGroupCertification = ref(true);
 
     watch(
         () => watchState.isLoggedIn,
@@ -119,8 +118,7 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
             saveInstanceEmojiConfig,
             vrcRegistryAutoBackupConfig,
             vrcRegistryAskRestoreConfig,
-            sentryErrorReportingConfig,
-            autoJoinGroupCertificationConfig
+            sentryErrorReportingConfig
         ] = await Promise.all([
             configRepository.getBool('enablePrimaryPassword', false),
             configRepository.getString('VRCX_bioLanguage'),
@@ -128,49 +126,36 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
             configRepository.getBool('VRCX_vrcQuitFix', true),
             configRepository.getBool('VRCX_autoSweepVRChatCache', false),
             configRepository.getBool('VRCX_selfInviteOverride', false),
-            configRepository.getBool('VRCX_saveInstancePrints', false),
+            configRepository.getBool('VRCX_saveInstancePrints', true),
             configRepository.getBool('VRCX_cropInstancePrints', false),
-            configRepository.getBool('VRCX_saveInstanceStickers', false),
+            configRepository.getBool('VRCX_saveInstanceStickers', true),
             configRepository.getBool('VRCX_avatarRemoteDatabase', true),
-            configRepository.getBool('VRCX_enableAppLauncher', true),
-            configRepository.getBool('VRCX_enableAppLauncherAutoClose', true),
-            configRepository.getBool(
-                'VRCX_enableAppLauncherRunProcessOnce',
-                true
-            ),
-            configRepository.getBool('VRCX_screenshotHelper', true),
-            configRepository.getBool(
-                'VRCX_screenshotHelperModifyFilename',
-                false
-            ),
-            configRepository.getBool(
-                'VRCX_screenshotHelperCopyToClipboard',
-                false
-            ),
-            configRepository.getBool('VRCX_youtubeAPI', false),
-            configRepository.getString('VRCX_youtubeAPIKey', ''),
-            configRepository.getBool('VRCX_translationAPI', false),
-            configRepository.getString('VRCX_translationAPIKey', ''),
-            configRepository.getString('VRCX_translationAPIType', 'google'),
-            configRepository.getString('VRCX_translationAPIEndpoint', ''),
-            configRepository.getString('VRCX_translationAPIModel', ''),
-            configRepository.getString('VRCX_translationAPIPrompt', ''),
+            configRepository.getBool('VRCX_enableAppLauncher', false),
+            configRepository.getBool('VRCX_enableAppLauncherAutoClose', false),
+            configRepository.getBool('VRCX_enableAppLauncherRunProcessOnce', false),
+            configRepository.getBool('VRCX_screenshotHelper', false),
+            configRepository.getBool('VRCX_screenshotHelperModifyFilename', false),
+            configRepository.getBool('VRCX_screenshotHelperCopyToClipboard', false),
+            configRepository.getBool('VRCX_youTubeApi', false),
+            configRepository.getString('VRCX_youTubeApiKey'),
+            configRepository.getBool('VRCX_translationApi', false),
+            configRepository.getString('VRCX_translationApiKey'),
+            configRepository.getString('VRCX_translationApiType'),
+            configRepository.getString('VRCX_translationApiEndpoint'),
+            configRepository.getString('VRCX_translationApiModel'),
+            configRepository.getString('VRCX_translationApiPrompt'),
             configRepository.getBool('VRCX_progressPie', false),
-            configRepository.getBool('VRCX_progressPieFilter', true),
-            configRepository.getBool(
-                'VRCX_showConfirmationOnSwitchAvatar',
-                false
-            ),
+            configRepository.getBool('VRCX_progressPieFilter', false),
+            configRepository.getBool('VRCX_showConfirmationOnSwitchAvatar', false),
             configRepository.getBool('VRCX_gameLogDisabled', false),
-            configRepository.getString('VRCX_avatarAutoCleanup', 'Off'),
-            configRepository.getString('VRCX_userGeneratedContentPath', ''),
+            configRepository.getBool('VRCX_avatarAutoCleanup', false),
+            configRepository.getString('VRCX_ugcFolderPath'),
             configRepository.getBool('VRCX_autoDeleteOldPrints', false),
-            configRepository.getFloat('VRCX_notificationOpacity', 100),
+            configRepository.getInt('VRCX_notificationOpacity', 100),
             configRepository.getBool('VRCX_saveInstanceEmoji', false),
             configRepository.getBool('VRCX_vrcRegistryAutoBackup', true),
             configRepository.getBool('VRCX_vrcRegistryAskRestore', true),
-            configRepository.getString('VRCX_SentryEnabled', ''),
-            configRepository.getBool('VRCX_autoJoinGroupCertification', true)
+            configRepository.getBool('VRCX_sentryErrorReporting', false)
         ]);
 
         if (!bioLanguageConfig || !languageCodes.includes(bioLanguageConfig)) {
@@ -218,7 +203,6 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
         vrcRegistryAutoBackup.value = vrcRegistryAutoBackupConfig;
         vrcRegistryAskRestore.value = vrcRegistryAskRestoreConfig;
         sentryErrorReporting.value = sentryErrorReportingConfig === 'true';
-        autoJoinGroupCertification.value = autoJoinGroupCertificationConfig;
 
         handleSetAppLauncherSettings();
 
@@ -667,14 +651,6 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
         await configRepository.setBool(
             'VRCX_vrcRegistryAskRestore',
             vrcRegistryAskRestore.value
-        );
-    }
-
-    async function setAutoJoinGroupCertification() {
-        autoJoinGroupCertification.value = !autoJoinGroupCertification.value;
-        await configRepository.setBool(
-            'VRCX_autoJoinGroupCertification',
-            autoJoinGroupCertification.value
         );
     }
 
@@ -1150,7 +1126,6 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
         vrcRegistryAutoBackup,
         vrcRegistryAskRestore,
         sentryErrorReporting,
-        autoJoinGroupCertification,
 
         setEnablePrimaryPassword,
         setEnablePrimaryPasswordConfigRepository,
@@ -1203,7 +1178,6 @@ export const useAdvancedSettingsStore = defineStore('AdvancedSettings', () => {
         setVrcRegistryAutoBackup,
         setVrcRegistryAskRestore,
         setSentryErrorReporting,
-        setAutoJoinGroupCertification,
         checkSentryConsent,
         askDeleteAllScreenshotMetadata
     };
