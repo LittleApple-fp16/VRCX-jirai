@@ -309,9 +309,21 @@
         const seenIds = new Set();
         const selfId = currentUser.value?.id;
 
+        // 0. Self
+        if (selfId) {
+            const selfUser = currentUser.value;
+            items.push({
+                value: selfId,
+                label: selfUser?.displayName || selfId,
+                search: selfUser?.displayName || selfId,
+                user: selfUser || null
+            });
+            seenIds.add(selfId);
+        }
+
         // 1. Friends
         for (const [friendId, friend] of friends.value.entries()) {
-            if (friendId === selfId) continue;
+            if (seenIds.has(friendId)) continue;
             const cached = cachedUsers.get(friendId);
             const displayName = friend.displayName || cached?.displayName || friendId;
             items.push({
@@ -325,7 +337,7 @@
 
         // 2. Tracked Non-Friends
         for (const item of trackedList.value) {
-            if (item.userId === selfId || seenIds.has(item.userId)) continue;
+            if (seenIds.has(item.userId)) continue;
             const cached = cachedUsers.get(item.userId);
             const displayName = item.displayName || cached?.displayName || item.userId;
             items.push({
