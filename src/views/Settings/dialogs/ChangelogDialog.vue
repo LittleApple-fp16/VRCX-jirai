@@ -28,7 +28,7 @@
                 <Button
                     variant="ghost"
                     class="mr-2"
-                    @click="openExternalLink('https://github.com/FuLuTang/VRCX-jirai/releases')">
+                    @click="openExternalLink(links.githubReleases)">
                     {{ t('dialog.change_log.github') }}
                 </Button>
                 <Button @click="closeDialog">
@@ -47,6 +47,7 @@
     import { useI18n } from 'vue-i18n';
 
     import { openExternalLink } from '../../../shared/utils';
+    import { links } from '../../../shared/constants';
     import { useVRCXUpdaterStore } from '../../../stores';
 
     const VueShowdown = defineAsyncComponent(() => import('vue-showdown').then((module) => module.VueShowdown));

@@ -1,6 +1,7 @@
 import { i18n } from '../plugins/i18n';
 import { openExternalLink } from '../shared/utils';
 import { useModalStore } from '../stores';
+import { links } from '../shared/constants/link';
 
 // requires binding of SQLite
 class SQLiteService {
@@ -17,7 +18,7 @@ class SQLiteService {
                     .then(({ ok }) => {
                         if (!ok) return;
                         openExternalLink(
-                            'https://github.com/FuLuTang/VRCX-jirai/wiki#how-to-repair-vrcx-database'
+                            links.wiki + '#how-to-repair-vrcx-database'
                         );
                     })
                     .catch(() => {});

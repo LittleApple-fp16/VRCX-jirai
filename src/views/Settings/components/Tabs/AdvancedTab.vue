@@ -107,7 +107,7 @@
                 <Button
                     size="sm"
                     variant="outline"
-                    @click="openExternalLink('https://github.com/FuLuTang/VRCX-jirai/wiki/Launch-parameters-&-VRCX.json')"
+                    @click="openExternalLink(links.wiki + '/Launch-parameters-&-VRCX.json')"
                     >{{ t('view.settings.advanced.advanced.launch_commands.docs') }}</Button
                 >
                 <Button
@@ -393,6 +393,8 @@
     import { useI18n } from 'vue-i18n';
 
     import VueJsonPretty from 'vue-json-pretty';
+
+    import { links } from '@/shared/constants';
 
     import {
         useAdvancedSettingsStore,

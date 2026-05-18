@@ -10,7 +10,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-col gap-0.5 px-1 py-1 cursor-pointer" @click="openExternalLink('https://github.com/FuLuTang/VRCX-jirai/releases')">
+            <div class="flex flex-col gap-0.5 px-1 py-1 cursor-pointer" @click="openExternalLink(links.githubReleases)">
                 <div class="flex-1">
                     <span class="block truncate font-medium text-sm leading-[18px]">{{
                         t('view.settings.general.general.latest_app_version')
@@ -47,7 +47,7 @@
                 <Button size="sm" variant="outline" @click="showChangeLogDialog">{{
                     t('view.settings.general.vrcx_updater.change_log')
                 }}</Button>
-                <Button v-if="!noUpdater" size="sm" variant="outline" @click="openExternalLink('https://github.com/FuLuTang/VRCX-jirai/releases')">{{
+                <Button v-if="!noUpdater" size="sm" variant="outline" @click="openExternalLink(links.githubReleases)">{{
                     t('view.settings.general.vrcx_updater.change_build')
                 }}</Button>
             </div>
@@ -122,10 +122,10 @@
         <SettingsGroup :title="t('view.settings.general.contributors.header')">
             <div>
                 <img
-                    src="https://contrib.rocks/image?repo=FuLuTang/VRCX-jirai"
+                    :src="links.githubContributorsImage"
                     alt="Contributors"
                     class="cursor-pointer"
-                    @click="openExternalLink('https://github.com/FuLuTang/VRCX-jirai/graphs/contributors')" />
+                    @click="openExternalLink(links.githubContributors)" />
             </div>
         </SettingsGroup>
 

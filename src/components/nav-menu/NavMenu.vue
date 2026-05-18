@@ -322,7 +322,7 @@
     };
 
     const openGithub = () => {
-        openExternalLink('https://github.com/FuLuTang/VRCX-jirai');
+        openExternalLink(links.github);
     };
 
     const handleSupportLink = (id) => {

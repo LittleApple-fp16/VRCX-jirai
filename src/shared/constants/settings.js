@@ -1,7 +1,7 @@
-const REPOSITORY = 'FuLuTang/VRCX-jirai';
-const GITHU_API_URL = 'https://api.github.com/repos/FuLuTang/VRCX-jirai';
-const GITHUB_RELEASES_URL =
-    'https://github.com/FuLuTang/VRCX-jirai/releases/latest';
+const REPOSITORY = 'LittleApple-fp16/VRCX-jirai';
+const GITHUB_BASE = `https://github.com/${REPOSITORY}`;
+const GITHU_API_URL = `https://api.github.com/repos/${REPOSITORY}`;
+const GITHUB_RELEASES_URL = `${GITHUB_BASE}/releases/latest`;
 
 const VRChatScreenshotResolutions = [
     { name: '1280x720 (720p)', width: 1280, height: 720 },
@@ -48,6 +48,7 @@ const DEFAULT_SEARCH_LIMIT = 50000;
 
 export {
     REPOSITORY,
+    GITHUB_BASE,
     GITHU_API_URL,
     GITHUB_RELEASES_URL,
     VRChatScreenshotResolutions,

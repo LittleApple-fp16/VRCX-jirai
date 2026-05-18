@@ -19,7 +19,7 @@
     <Title>VRCX-Jirai</Title>
     <Description>VRCX Jirai Edition</Description>
     <PackageIcon>..\images\VRCX.png</PackageIcon>
-    <RepositoryUrl>https://github.com/FuLuTang/VRCX-jirai</RepositoryUrl>
+    <RepositoryUrl>https://github.com/LittleApple-fp16/VRCX-jirai</RepositoryUrl>
     <ResourceLanguages>en</ResourceLanguages>
     <SatelliteResourceLanguages>en-US;en</SatelliteResourceLanguages>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
