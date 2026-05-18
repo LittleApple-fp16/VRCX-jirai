@@ -484,10 +484,6 @@
      *
      */
     function search() {
-        if (activeSearchTab.value === 'avatar' && (!searchText.value || searchText.value.length < 3)) {
-            toast.warning(t('view.search.avatar.min_chars_warning'));
-            return;
-        }
         switch (activeSearchTab.value) {
             case 'user':
                 searchUser();

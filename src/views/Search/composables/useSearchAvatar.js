@@ -25,7 +25,7 @@ export function useSearchAvatar() {
         const avatars = new Map();
         const query = searchText.value;
 
-        if (query && query.length >= 3 && avatarRemoteDatabase.value) {
+        if (query && avatarRemoteDatabase.value) {
             const data = await lookupAvatars('search', query);
             if (data && typeof data === 'object') {
                 data.forEach((avatar) => {
