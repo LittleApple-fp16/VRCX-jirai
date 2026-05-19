@@ -501,7 +501,7 @@
 
     const hasFriendSelection = computed(() => selectedFavoriteFriends.value.length > 0);
     const hasSearchInput = computed(() => friendFavoriteSearch.value.trim().length > 0);
-    const isSearchActive = computed(() => friendFavoriteSearch.value.trim().length >= 3);
+    const isSearchActive = computed(() => friendFavoriteSearch.value.trim().length >= 1);
 
     const closeFriendToolbarMenu = () => {
         friendToolbarMenuOpen.value = false;
@@ -640,7 +640,7 @@
      */
     function doSearchFriendFavorites(searchTerm) {
         const search = searchTerm.trim().toLowerCase();
-        if (search.length < 3) {
+        if (search.length < 1) {
             friendFavoriteSearchResults.value = [];
             return;
         }

@@ -614,7 +614,7 @@
 
     const hasAvatarSelection = computed(() => selectedFavoriteAvatars.value.length > 0);
     const hasSearchInput = computed(() => avatarFavoriteSearch.value.trim().length > 0);
-    const isSearchActive = computed(() => avatarFavoriteSearch.value.trim().length >= 3);
+    const isSearchActive = computed(() => avatarFavoriteSearch.value.trim().length >= 1);
 
     const closeAvatarToolbarMenu = () => {
         avatarToolbarMenuOpen.value = false;
@@ -1074,7 +1074,7 @@
             avatarFavoriteSearch.value = value;
         }
         const search = avatarFavoriteSearch.value.trim().toLowerCase();
-        if (search.length < 3) {
+        if (search.length < 1) {
             avatarFavoriteSearchResults.value = [];
             return;
         }

@@ -526,7 +526,7 @@
 
     const hasWorldSelection = computed(() => selectedFavoriteWorlds.value.length > 0);
     const hasSearchInput = computed(() => worldFavoriteSearch.value.trim().length > 0);
-    const isSearchActive = computed(() => worldFavoriteSearch.value.trim().length >= 3);
+    const isSearchActive = computed(() => worldFavoriteSearch.value.trim().length >= 1);
 
     const closeWorldToolbarMenu = () => {
         worldToolbarMenuOpen.value = false;
@@ -997,7 +997,7 @@
      */
     function doSearchWorldFavorites(searchInput) {
         const search = (searchInput ?? worldFavoriteSearch.value).trim().toLowerCase();
-        if (search.length < 3) {
+        if (search.length < 1) {
             worldFavoriteSearchResults.value = [];
             return;
         }
