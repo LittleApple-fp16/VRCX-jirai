@@ -13,7 +13,7 @@
      * controlled by the Worker search results (which handle confusable
      * characters, diacritics, and locale-aware matching).
      */
-    import { nextTick, watch } from 'vue';
+    import { watch } from 'vue';
     import { useCommand } from '@/components/ui/command';
 
     import { useQuickSearchStore } from '../stores/quickSearch';
@@ -33,17 +33,16 @@
 
     watch(
         () => filterState.search,
-        async (value) => {
+        (value) => {
             quickSearchStore.setQuery(value);
 
-            // Override the built-in Command filter for all queries.
+            // Override the built-in Command filter synchronously for all queries.
             // The Worker already handles confusable-character normalization
             // and locale-aware matching; the Command's built-in useFilter
             // would otherwise hide results that the Worker correctly matched via confusables.
-            if (value) {
-                await nextTick();
-                overrideFilter();
-            }
+            // Must fire for ALL values (including empty) to prevent the built-in
+            // reka-ui contains() filter from hiding items during the initial keystroke.
+            overrideFilter();
         }
     );
 </script>
