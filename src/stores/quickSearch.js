@@ -60,7 +60,10 @@ export const useQuickSearchStore = defineStore('QuickSearch', () => {
             friendResults.value.length > 0 ||
             ownAvatarResults.value.length > 0 ||
             favoriteAvatarResults.value.length > 0 ||
+            ownWorldResults.value.length > 0 ||
             favoriteWorldResults.value.length > 0 ||
+            ownGroupResults.value.length > 0 ||
+            joinedGroupResults.value.length > 0 ||
             recentlyMetResults.value.length > 0 ||
             recentBeenResults.value.length > 0
     );
@@ -90,12 +93,15 @@ export const useQuickSearchStore = defineStore('QuickSearch', () => {
             recentBeenResults.value = recentlyJoinedLocations.value;
             return;
         }
-        const lowerQ = q.toLowerCase();
+        const comparer = new Intl.Collator(undefined, {
+            usage: 'search',
+            sensitivity: 'base'
+        });
         recentlyMetResults.value = recentlyMetUsers.value.filter((u) =>
-            u.displayName?.toLowerCase().includes(lowerQ)
+            u.displayName ? comparer.compare(u.displayName.substring(0, q.length), q) === 0 || u.displayName.toLowerCase().includes(q.toLowerCase()) : false
         );
         recentBeenResults.value = recentlyJoinedLocations.value.filter((l) =>
-            l.worldName?.toLowerCase().includes(lowerQ)
+            l.worldName ? comparer.compare(l.worldName.substring(0, q.length), q) === 0 || l.worldName.toLowerCase().includes(q.toLowerCase()) : false
         );
     }
 
@@ -110,7 +116,7 @@ export const useQuickSearchStore = defineStore('QuickSearch', () => {
             if (query.value && query.value.length >= 1) {
                 dispatchSearch();
             }
-        }, 200);
+        }, 50);
     }
 
     function sendIndexUpdate() {

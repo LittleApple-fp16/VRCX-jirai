@@ -18,7 +18,10 @@
         friendResults,
         ownAvatarResults,
         favoriteAvatarResults,
+        ownWorldResults,
         favoriteWorldResults,
+        ownGroupResults,
+        joinedGroupResults,
         recentlyMetResults,
         recentBeenResults,
         hasResults
@@ -159,6 +162,25 @@
                         </CommandGroup>
 
                         <CommandGroup
+                            v-if="ownWorldResults.length > 0"
+                            :heading="t('side_panel.search_own_worlds')">
+                            <CommandItem
+                                v-for="item in ownWorldResults"
+                                :key="item.id"
+                                :value="item.name + ' own ' + item.id"
+                                class="gap-3"
+                                @select="handleSelect(item)">
+                                <img
+                                    v-if="item.imageUrl"
+                                    :src="item.imageUrl"
+                                    class="size-6 rounded object-cover"
+                                    loading="lazy" />
+                                <Globe v-else class="size-4" />
+                                <span class="truncate">{{ item.name }}</span>
+                            </CommandItem>
+                        </CommandGroup>
+
+                        <CommandGroup
                             v-if="favoriteWorldResults.length > 0"
                             :heading="t('side_panel.search_fav_worlds')">
                             <CommandItem
@@ -173,6 +195,44 @@
                                     class="size-6 rounded object-cover"
                                     loading="lazy" />
                                 <Globe v-else class="size-4" />
+                                <span class="truncate">{{ item.name }}</span>
+                            </CommandItem>
+                        </CommandGroup>
+
+                        <CommandGroup
+                            v-if="ownGroupResults.length > 0"
+                            :heading="t('side_panel.search_own_groups')">
+                            <CommandItem
+                                v-for="item in ownGroupResults"
+                                :key="item.id"
+                                :value="item.name + ' own ' + item.id"
+                                class="gap-3"
+                                @select="handleSelect(item)">
+                                <img
+                                    v-if="item.imageUrl"
+                                    :src="item.imageUrl"
+                                    class="size-6 rounded object-cover"
+                                    loading="lazy" />
+                                <Users v-else class="size-4" />
+                                <span class="truncate">{{ item.name }}</span>
+                            </CommandItem>
+                        </CommandGroup>
+
+                        <CommandGroup
+                            v-if="joinedGroupResults.length > 0"
+                            :heading="t('side_panel.search_joined_groups')">
+                            <CommandItem
+                                v-for="item in joinedGroupResults"
+                                :key="item.id"
+                                :value="item.name + ' joined ' + item.id"
+                                class="gap-3"
+                                @select="handleSelect(item)">
+                                <img
+                                    v-if="item.imageUrl"
+                                    :src="item.imageUrl"
+                                    class="size-6 rounded object-cover"
+                                    loading="lazy" />
+                                <Users v-else class="size-4" />
                                 <span class="truncate">{{ item.name }}</span>
                             </CommandItem>
                         </CommandGroup>
