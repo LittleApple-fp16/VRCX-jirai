@@ -34,6 +34,7 @@ const mocks = vi.hoisted(() => ({
         runAvatarAutoCleanup: vi.fn()
     },
     generalSettingsStore: {
+        autoLoginEnabled: true,
         autoLoginDelayEnabled: false,
         autoLoginDelaySeconds: 0
     },

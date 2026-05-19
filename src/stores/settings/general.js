@@ -28,6 +28,7 @@ export const useGeneralSettingsStore = defineStore('GeneralSettings', () => {
     const udonExceptionLogging = ref(false);
     const logResourceLoad = ref(false);
     const logEmptyAvatars = ref(false);
+    const autoLoginEnabled = ref(false);
     const autoLoginDelayEnabled = ref(false);
     const autoLoginDelaySeconds = ref(0);
     const autoStateChangeEnabled = ref(false);
@@ -57,6 +58,7 @@ export const useGeneralSettingsStore = defineStore('GeneralSettings', () => {
             udonExceptionLoggingConfig,
             logResourceLoadConfig,
             logEmptyAvatarsConfig,
+            autoLoginEnabledConfig,
             autoLoginDelayEnabledConfig,
             autoLoginDelaySecondsConfig,
             autoStateChangeEnabledConfig,
@@ -84,6 +86,7 @@ export const useGeneralSettingsStore = defineStore('GeneralSettings', () => {
             configRepository.getBool('VRCX_udonExceptionLogging', false),
             configRepository.getBool('VRCX_logResourceLoad', false),
             configRepository.getBool('VRCX_logEmptyAvatars', false),
+            configRepository.getBool('VRCX_autoLoginEnabled', false),
             configRepository.getBool('VRCX_autoLoginDelayEnabled', false),
             configRepository.getInt('VRCX_autoLoginDelaySeconds', 0),
             configRepository.getBool('VRCX_autoStateChangeEnabled', false),
@@ -143,6 +146,7 @@ export const useGeneralSettingsStore = defineStore('GeneralSettings', () => {
         udonExceptionLogging.value = udonExceptionLoggingConfig;
         logResourceLoad.value = logResourceLoadConfig;
         logEmptyAvatars.value = logEmptyAvatarsConfig;
+        autoLoginEnabled.value = autoLoginEnabledConfig;
         autoLoginDelayEnabled.value = autoLoginDelayEnabledConfig;
         autoLoginDelaySeconds.value = autoLoginDelaySecondsConfig;
         autoStateChangeEnabled.value = autoStateChangeEnabledConfig;
@@ -230,6 +234,13 @@ export const useGeneralSettingsStore = defineStore('GeneralSettings', () => {
     function setLogEmptyAvatars() {
         logEmptyAvatars.value = !logEmptyAvatars.value;
         configRepository.setBool('VRCX_logEmptyAvatars', logEmptyAvatars.value);
+    }
+    function setAutoLoginEnabled() {
+        autoLoginEnabled.value = !autoLoginEnabled.value;
+        configRepository.setBool(
+            'VRCX_autoLoginEnabled',
+            autoLoginEnabled.value
+        );
     }
     function setAutoLoginDelayEnabled() {
         autoLoginDelayEnabled.value = !autoLoginDelayEnabled.value;
@@ -451,6 +462,7 @@ export const useGeneralSettingsStore = defineStore('GeneralSettings', () => {
         udonExceptionLogging,
         logResourceLoad,
         logEmptyAvatars,
+        autoLoginEnabled,
         autoLoginDelayEnabled,
         autoLoginDelaySeconds,
         autoStateChangeEnabled,
@@ -477,6 +489,7 @@ export const useGeneralSettingsStore = defineStore('GeneralSettings', () => {
         setUdonExceptionLogging,
         setLogResourceLoad,
         setLogEmptyAvatars,
+        setAutoLoginEnabled,
         setAutoLoginDelayEnabled,
         promptAutoLoginDelaySeconds,
         setAutoStateChangeEnabled,

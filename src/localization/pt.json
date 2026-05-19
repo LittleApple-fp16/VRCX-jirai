@@ -772,6 +772,7 @@
                     "header": "Registro",
                     "resource_load": "Registrar Carregamento de String/Imagem Udon",
                     "empty_avatar": "Registrar Avatares no Feed sem Nomes",
+                    "auto_login_enabled": "Login Automático na Inicialização",
                     "auto_login_delay": "Atraso de Login Automático",
                     "auto_login_delay_button": "Definir Segundos de Atraso"
                 },

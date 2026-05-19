@@ -795,6 +795,7 @@
                     "header": "記錄",
                     "resource_load": "記錄 Udon 字串/圖片載入",
                     "empty_avatar": "記錄沒有名稱的動態影像",
+                    "auto_login_enabled": "啟動時自動登入",
                     "auto_login_delay": "自動登入延遲",
                     "auto_login_delay_button": "設定延遲秒數"
                 },

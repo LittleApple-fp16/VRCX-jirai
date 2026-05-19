@@ -207,6 +207,10 @@ export const useAuthStore = defineStore('Auth', () => {
             );
             return;
         }
+        if (!generalSettingsStore.autoLoginEnabled) {
+            console.log('Skipping auto-login after mount because auto-login is disabled.');
+            return;
+        }
         if (
             !advancedSettingsStore.enablePrimaryPassword &&
             (await configRepository.getString('lastUserLoggedIn')) !== null
@@ -974,6 +978,10 @@ export const useAuthStore = defineStore('Auth', () => {
             console.warn(
                 'Skipping auto-login because database initialization did not complete successfully.'
             );
+            return;
+        }
+        if (!generalSettingsStore.autoLoginEnabled) {
+            console.log('Skipping auto-login because auto-login is disabled.');
             return;
         }
         await runHandleAutoLoginFlow();

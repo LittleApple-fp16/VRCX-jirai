@@ -780,6 +780,7 @@
                     "header": "ロギング",
                     "resource_load": "Udon での文字列/画像読み込みを記録",
                     "empty_avatar": "フィードにアバターを名前なしで記録",
+                    "auto_login_enabled": "起動時に自動ログイン",
                     "auto_login_delay": "自動ログイン遅延",
                     "auto_login_delay_button": "遅延秒数を設定"
                 },

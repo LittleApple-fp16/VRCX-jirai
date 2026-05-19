@@ -928,6 +928,7 @@
                     "header": "日志",
                     "resource_load": "显示世界内 Udon 网络资源的加载详情",
                     "empty_avatar": "不在动态里记录模型名称",
+                    "auto_login_enabled": "启动时自动登录",
                     "auto_login_delay": "自动登录延迟",
                     "auto_login_delay_button": "设置延迟（秒）"
                 },
