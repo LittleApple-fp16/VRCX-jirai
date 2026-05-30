@@ -10,9 +10,14 @@ import { useNotificationStore } from '../stores/notification';
 import * as workerTimers from 'worker-timers';
 
 let _isProtectionSwitching = false;
+let _pendingProtection = false;
 
 export function isProtectionSwitching() {
     return _isProtectionSwitching;
+}
+
+export function clearProtectionPending() {
+    _pendingProtection = false;
 }
 
 function desktopNotification(title, body) {
@@ -35,42 +40,74 @@ async function ensureSettings() {
     return settingsStore;
 }
 
-export async function checkAvatarProtection(locationTag) {
-    const settingsStore = await ensureSettings();
-
-    if (!settingsStore.enableAvatarProtection) {
-        return;
-    }
-    if (settingsStore.protectedAvatarIds.length === 0) {
-        return;
-    }
-
+function isUntrustedRoom(locationTag, untrustedTypes) {
     const L = parseLocation(locationTag);
-    if (!L.isRealInstance) {
-        return;
-    }
-    if (!settingsStore.untrustedRoomTypes.includes(L.accessTypeName)) {
-        return;
-    }
+    if (!L.isRealInstance) return false;
+    return untrustedTypes.includes(L.accessTypeName);
+}
+
+function isProtectedAvatar(avatarId, protectedIds) {
+    if (!avatarId) return false;
+    return protectedIds.includes(avatarId);
+}
+
+/**
+ * Called when user is TRAVELING to a new location (location-destination / travelingToLocation).
+ * VRChat blocks avatar switching during travel, so only warn + mark pending.
+ */
+export async function checkAvatarProtectionOnTravel(destinationTag) {
+    const settingsStore = await ensureSettings();
+    if (!settingsStore.enableAvatarProtection) return;
+    if (settingsStore.protectedAvatarIds.length === 0) return;
+    if (!isUntrustedRoom(destinationTag, settingsStore.untrustedRoomTypes)) return;
 
     const userStore = useUserStore();
-    const currentAvatarId = userStore.currentUser.currentAvatar;
-    if (!currentAvatarId) {
+    if (!isProtectedAvatar(userStore.currentUser.currentAvatar, settingsStore.protectedAvatarIds)) return;
+
+    const t = i18n.global.t;
+    const message = t('message.avatar_protection.triggered');
+    desktopNotification('Avatar Protection', message);
+
+    const noty = {
+        type: 'External',
+        created_at: new Date().toJSON(),
+        message,
+        displayName: 'Avatar Protection'
+    };
+    useNotificationStore().playNoty(noty);
+    toast.warning(message);
+
+    _pendingProtection = true;
+}
+
+/**
+ * Called on location arrival or when already in a room.
+ * Executes pending switch if set, otherwise does full detection.
+ */
+export async function checkAvatarProtection(locationTag) {
+    const L = parseLocation(locationTag);
+    if (_pendingProtection && L.isRealInstance) {
+        _pendingProtection = false;
+        await trySwitchAvatar();
         return;
     }
-    if (!settingsStore.protectedAvatarIds.includes(currentAvatarId)) {
-        return;
+    if (_pendingProtection && !L.isRealInstance) {
+        _pendingProtection = false;
     }
+
+    const settingsStore = await ensureSettings();
+    if (!settingsStore.enableAvatarProtection) return;
+    if (settingsStore.protectedAvatarIds.length === 0) return;
+    if (!isUntrustedRoom(locationTag, settingsStore.untrustedRoomTypes)) return;
+
+    const userStore = useUserStore();
+    if (!isProtectedAvatar(userStore.currentUser.currentAvatar, settingsStore.protectedAvatarIds)) return;
 
     await triggerProtection();
 }
 
 async function triggerProtection() {
-    const settingsStore = useAvatarProtectionSettingsStore();
-    const userStore = useUserStore();
-    const notificationStore = useNotificationStore();
     const t = i18n.global.t;
-
     const message = t('message.avatar_protection.triggered');
 
     desktopNotification('Avatar Protection', message);
@@ -78,10 +115,10 @@ async function triggerProtection() {
     const noty = {
         type: 'External',
         created_at: new Date().toJSON(),
-        message: message,
+        message,
         displayName: 'Avatar Protection'
     };
-    notificationStore.playNoty(noty);
+    useNotificationStore().playNoty(noty);
     toast.warning(message);
 
     await trySwitchAvatar();
@@ -177,30 +214,15 @@ export function initAvatarProtection() {
     watch(
         () => userStore.currentUser.currentAvatar,
         (newAvatarId, oldAvatarId) => {
-            if (!newAvatarId || newAvatarId === oldAvatarId) {
-                return;
-            }
-            if (_isProtectionSwitching) {
-                return;
-            }
-            if (!settingsStore.enableAvatarProtection) {
-                return;
-            }
-            if (settingsStore.protectedAvatarIds.length === 0) {
-                return;
-            }
-            if (!settingsStore.protectedAvatarIds.includes(newAvatarId)) {
-                return;
-            }
+            if (!newAvatarId || newAvatarId === oldAvatarId) return;
+            if (_isProtectionSwitching) return;
+            if (!settingsStore.enableAvatarProtection) return;
+            if (settingsStore.protectedAvatarIds.length === 0) return;
+            if (!settingsStore.protectedAvatarIds.includes(newAvatarId)) return;
 
             const currentLocation = userStore.currentUser.$locationTag;
-            if (!currentLocation) {
-                return;
-            }
-            const L = parseLocation(currentLocation);
-            if (!settingsStore.untrustedRoomTypes.includes(L.accessTypeName)) {
-                return;
-            }
+            if (!currentLocation) return;
+            if (!isUntrustedRoom(currentLocation, settingsStore.untrustedRoomTypes)) return;
 
             triggerProtection();
         }

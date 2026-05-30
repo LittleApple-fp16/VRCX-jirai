@@ -14,7 +14,7 @@ import { useNotificationStore } from '../stores/notification';
 import { usePhotonStore } from '../stores/photon';
 import { useUserStore } from '../stores/user';
 import { useVrStore } from '../stores/vr';
-import { checkAvatarProtection } from './avatarProtectionCoordinator';
+import { checkAvatarProtection, checkAvatarProtectionOnTravel, clearProtectionPending } from './avatarProtectionCoordinator';
 
 export function runUpdateCurrentUserLocationFlow() {
     const advancedSettingsStore = useAdvancedSettingsStore();
@@ -83,6 +83,9 @@ export async function runSetCurrentUserLocationFlow(
     userStore.setCurrentUserLocationState(location, travelingToLocation);
     runUpdateCurrentUserLocationFlow();
     checkAvatarProtection(location);
+    if (travelingToLocation && travelingToLocation !== location) {
+        checkAvatarProtectionOnTravel(travelingToLocation);
+    }
 
     // janky gameLog support for Quest
     if (gameStore.isGameRunning) {
@@ -188,6 +191,7 @@ export function runLastLocationResetFlow(gameLogDate) {
         playerList: new Map(),
         friendList: new Map()
     });
+    clearProtectionPending();
     runUpdateCurrentUserLocationFlow();
     instanceStore.updateCurrentInstanceWorld();
     vrStore.updateVRLastLocation();
