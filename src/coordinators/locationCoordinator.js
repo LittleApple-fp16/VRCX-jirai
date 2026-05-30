@@ -14,6 +14,7 @@ import { useNotificationStore } from '../stores/notification';
 import { usePhotonStore } from '../stores/photon';
 import { useUserStore } from '../stores/user';
 import { useVrStore } from '../stores/vr';
+import { checkAvatarProtection } from './avatarProtectionCoordinator';
 
 export function runUpdateCurrentUserLocationFlow() {
     const advancedSettingsStore = useAdvancedSettingsStore();
@@ -127,6 +128,8 @@ export async function runSetCurrentUserLocationFlow(
         userStore.applyUserDialogLocation();
         instanceStore.applyWorldDialogInstances();
         instanceStore.applyGroupDialogInstances();
+
+        checkAvatarProtection(location);
     } else {
         locationStore.setLastLocation({
             ...locationStore.lastLocation,

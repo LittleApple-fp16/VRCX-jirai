@@ -29,6 +29,7 @@
         runUpdateIsGameRunningFlow,
         runUpdateIsHmdAfkFlow
     } from './coordinators/gameCoordinator';
+    import { initAvatarProtection } from './coordinators/avatarProtectionCoordinator';
     import { Toaster } from './components/ui/sonner';
     import { TooltipProvider } from './components/ui/tooltip';
     import { createGlobalStores } from './stores';
@@ -73,5 +74,6 @@
         store.auth.autoLoginAfterMounted();
         store.vrcx.checkAutoBackupRestoreVrcRegistry();
         runCheckVRChatDebugLoggingFlow();
+        initAvatarProtection();
     });
 </script>

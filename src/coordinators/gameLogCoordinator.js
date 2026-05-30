@@ -41,6 +41,7 @@ import { useVrcxStore } from '../stores/vrcx';
 
 import gameLogService from '../services/gameLog.js';
 import { useManualRelationsStore } from '../stores/manualRelations';
+import { checkAvatarProtection } from './avatarProtectionCoordinator';
 
 import * as workerTimers from 'worker-timers';
 
@@ -190,6 +191,7 @@ export function addGameLogEntry(gameLog, location) {
                 userStore.applyUserDialogLocation();
                 instanceStore.applyWorldDialogInstances();
                 instanceStore.applyGroupDialogInstances();
+                checkAvatarProtection(gameLog.location);
             }
             break;
         case 'location':
@@ -215,6 +217,7 @@ export function addGameLogEntry(gameLog, location) {
                 userStore.applyUserDialogLocation();
                 instanceStore.applyWorldDialogInstances();
                 instanceStore.applyGroupDialogInstances();
+                checkAvatarProtection(gameLog.location);
             }
             instanceStore.addInstanceJoinHistory(gameLog.location, gameLog.dt);
             const L = parseLocation(gameLog.location);

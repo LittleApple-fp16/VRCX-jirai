@@ -4,6 +4,7 @@ import { getSentry, isSentryOptedIn } from '../plugins';
 import { useAdvancedSettingsStore } from './settings/advanced';
 import { useActivityStore } from './activity';
 import { useAppearanceSettingsStore } from './settings/appearance';
+import { useAvatarProtectionSettingsStore } from './settings/avatarProtection';
 import { useAuthStore } from './auth';
 import { useAvatarProviderStore } from './avatarProvider';
 import { useAvatarStore } from './avatar';
@@ -130,6 +131,7 @@ export function createGlobalStores() {
         advancedSettings: useAdvancedSettingsStore(),
         activity: useActivityStore(),
         appearanceSettings: useAppearanceSettingsStore(),
+        avatarProtectionSettings: useAvatarProtectionSettingsStore(),
         discordPresenceSettings: useDiscordPresenceSettingsStore(),
         generalSettings: useGeneralSettingsStore(),
         notificationsSettings: useNotificationsSettingsStore(),
@@ -174,6 +176,7 @@ export function createGlobalStores() {
 
 export {
     useAuthStore,
+    useAvatarProtectionSettingsStore,
     useAvatarStore,
     useAvatarProviderStore,
     useFavoriteStore,

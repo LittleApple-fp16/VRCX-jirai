@@ -36,6 +36,73 @@
                     :disabled="!enablePrimaryPassword"
                     @update:modelValue="enablePrimaryPasswordChange" />
             </SettingsItem>
+
+            <div class="mt-2 border-t border-border pt-3">
+                <h4 class="text-sm font-semibold text-foreground mb-2">{{ t('view.settings.advanced.advanced.avatar_protection.header') }}</h4>
+                <p class="text-xs text-muted-foreground mb-3">{{ t('view.settings.advanced.advanced.avatar_protection.description') }}</p>
+
+                <SettingsItem :label="t('view.settings.advanced.advanced.avatar_protection.enable_protection')">
+                    <Switch :model-value="avatarProtectionEnabled" @update:modelValue="setAvatarProtectionEnabled" />
+                </SettingsItem>
+
+                <template v-if="avatarProtectionEnabled">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm text-foreground">{{ t('view.settings.advanced.advanced.avatar_protection.protected_avatars') }}</label>
+                        <Textarea
+                            :model-value="protectedAvatarIdsText"
+                            @update:modelValue="onProtectedAvatarIdsChange"
+                            :placeholder="t('view.settings.advanced.advanced.avatar_protection.protected_avatars_placeholder')"
+                            class="min-h-20" />
+                        <div class="flex gap-2">
+                            <Button size="sm" variant="outline" @click="addCurrentAvatarToProtection">
+                                {{ t('view.settings.advanced.advanced.avatar_protection.add_current_avatar') }}
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5 mt-3">
+                        <label class="text-sm text-foreground">{{ t('view.settings.advanced.advanced.avatar_protection.fallback_avatar') }}</label>
+                        <div class="flex gap-2">
+                            <input
+                                :value="fallbackAvatarId"
+                                @change="onFallbackAvatarIdChange"
+                                type="text"
+                                class="border-input bg-transparent rounded-md border px-3 py-1.5 text-sm flex-1 min-w-0"
+                                placeholder="avtr_xxxxxxxxx" />
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-1.5 mt-3">
+                        <label class="text-sm text-foreground">{{ t('view.settings.advanced.advanced.avatar_protection.untrusted_rooms') }}</label>
+                        <div class="flex flex-wrap gap-4">
+                            <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                <Checkbox
+                                    :checked="untrustedRoomTypes.includes('public')"
+                                    @update:checked="toggleUntrustedRoomType('public')" />
+                                {{ t('view.settings.advanced.advanced.avatar_protection.public') }}
+                            </label>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                <Checkbox
+                                    :checked="untrustedRoomTypes.includes('groupPublic')"
+                                    @update:checked="toggleUntrustedRoomType('groupPublic')" />
+                                {{ t('view.settings.advanced.advanced.avatar_protection.group_public') }}
+                            </label>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                <Checkbox
+                                    :checked="untrustedRoomTypes.includes('groupPlus')"
+                                    @update:checked="toggleUntrustedRoomType('groupPlus')" />
+                                {{ t('view.settings.advanced.advanced.avatar_protection.group_plus') }}
+                            </label>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                <Checkbox
+                                    :checked="untrustedRoomTypes.includes('group')"
+                                    @update:checked="toggleUntrustedRoomType('group')" />
+                                {{ t('view.settings.advanced.advanced.avatar_protection.group') }}
+                            </label>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </SettingsGroup>
 
         <SettingsGroup :title="t('view.settings.general.logging.header')">
@@ -390,6 +457,8 @@
     import { computed, reactive, ref } from 'vue';
     import { Button } from '@/components/ui/button';
     import { Switch } from '@/components/ui/switch';
+    import { Checkbox } from '@/components/ui/checkbox';
+    import { Textarea } from '@/components/ui/textarea';
     import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
     import { Alert, AlertDescription } from '@/components/ui/alert';
     import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -404,6 +473,7 @@
         useAdvancedSettingsStore,
         useAppearanceSettingsStore,
         useAuthStore,
+        useAvatarProtectionSettingsStore,
         useAvatarStore,
         useGeneralSettingsStore,
         useGroupStore,
@@ -453,6 +523,61 @@
     const { branch } = storeToRefs(useVRCXUpdaterStore());
 
     const { isDarkMode } = storeToRefs(useAppearanceSettingsStore());
+
+    const avatarProtectionSettings = useAvatarProtectionSettingsStore();
+    const {
+        enableAvatarProtection: avatarProtectionEnabled,
+        protectedAvatarIds,
+        fallbackAvatarId,
+        untrustedRoomTypes
+    } = storeToRefs(avatarProtectionSettings);
+    const {
+        setEnableAvatarProtection: setAvatarProtectionEnabled,
+        setProtectedAvatarIds,
+        setFallbackAvatarId,
+        setUntrustedRoomTypes
+    } = avatarProtectionSettings;
+
+    const userStore = useUserStore();
+
+    const protectedAvatarIdsText = computed({
+        get: () => protectedAvatarIds.value.join('\n'),
+        set: (val) => {
+            const ids = val.split('\n').map(s => s.trim()).filter(Boolean);
+            setProtectedAvatarIds(ids);
+        }
+    });
+
+    function onProtectedAvatarIdsChange(e) {
+        const val = e?.target?.value ?? e ?? '';
+        protectedAvatarIdsText.value = val;
+    }
+
+    function onFallbackAvatarIdChange(e) {
+        const val = e?.target?.value ?? '';
+        setFallbackAvatarId(val);
+    }
+
+    function toggleUntrustedRoomType(type) {
+        const current = [...untrustedRoomTypes.value];
+        const idx = current.indexOf(type);
+        if (idx >= 0) {
+            current.splice(idx, 1);
+        } else {
+            current.push(type);
+        }
+        setUntrustedRoomTypes(current);
+    }
+
+    function addCurrentAvatarToProtection() {
+        const currentId = userStore.currentUser.currentAvatar;
+        if (!currentId) return;
+        const current = [...protectedAvatarIds.value];
+        if (!current.includes(currentId)) {
+            current.push(currentId);
+            setProtectedAvatarIds(current);
+        }
+    }
 
     const {
         enablePrimaryPassword,

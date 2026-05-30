@@ -1225,6 +1225,21 @@
                         "header": "独立密码",
                         "description": "使用独立密码加密 VRCX 数据（将停用自动登录）"
                     },
+                    "avatar_protection": {
+                        "header": "模型防盗保护",
+                        "description": "进入不信任房间时，若穿着受保护模型则自动切换为回退模型。",
+                        "enable_protection": "启用保护",
+                        "protected_avatars": "受保护模型（每行一个ID）",
+                        "protected_avatars_placeholder": "avtr_xxxxxxxxx",
+                        "add_current_avatar": "添加当前模型",
+                        "fallback_avatar": "回退模型ID",
+                        "select_fallback": "选择",
+                        "untrusted_rooms": "不信任房间类型",
+                        "public": "公开房",
+                        "group_public": "群组公开房",
+                        "group_plus": "群组+房",
+                        "group": "群组房"
+                    },
                     "relaunch_vrchat": {
                         "header": "崩溃后重启",
                         "description": "重新加入崩溃前的房间"
@@ -2846,6 +2861,12 @@
             "failed": "在模型数据库中查找此模型信息时失败",
             "private_or_not_found": "此玩家的模型是私人的，或者在公共模型数据库中未能找到",
             "loading": "正在从指定的模型数据库中查找模型"
+        },
+        "avatar_protection": {
+            "triggered": "模型防盗保护触发！检测到在不信任房间中穿戴受保护模型。",
+            "switched": "已成功切换为回退模型。",
+            "failed": "切换模型失败，请手动更换。",
+            "fallback_is_protected": "回退模型不能出现在受保护列表中！"
         },
         "database": {
             "upgrade_complete": "数据库升级完成",

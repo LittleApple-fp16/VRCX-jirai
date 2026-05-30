@@ -1206,6 +1206,21 @@
                         "header": "Primary Password",
                         "description": "Encrypt Password (Disables Auto Login)"
                     },
+                    "avatar_protection": {
+                        "header": "Avatar Steal Protection",
+                        "description": "Auto switch to a fallback avatar when entering untrusted rooms while wearing a protected avatar.",
+                        "enable_protection": "Enable Protection",
+                        "protected_avatars": "Protected Avatars (one ID per line)",
+                        "protected_avatars_placeholder": "avtr_xxxxxxxxx",
+                        "add_current_avatar": "Add Current Avatar",
+                        "fallback_avatar": "Fallback Avatar ID",
+                        "select_fallback": "Select",
+                        "untrusted_rooms": "Untrusted Room Types",
+                        "public": "Public",
+                        "group_public": "Group Public",
+                        "group_plus": "Group+",
+                        "group": "Group"
+                    },
                     "relaunch_vrchat": {
                         "header": "Auto Relaunch VRChat After Crash",
                         "description": "Automatically relaunch and rejoin the last instance after a crash."
@@ -2835,6 +2850,12 @@
             "failed": "Avatar lookup failed",
             "private_or_not_found": "Users avatar is private or not found in search providers",
             "loading": "Searching for avatar using search providers"
+        },
+        "avatar_protection": {
+            "triggered": "Avatar protection triggered! Detected protected avatar in untrusted room.",
+            "switched": "Switched to fallback avatar successfully.",
+            "failed": "Failed to switch avatar. Please change manually.",
+            "fallback_is_protected": "Fallback avatar cannot be in the protected list!"
         },
         "database": {
             "upgrade_complete": "Database upgrade complete",
