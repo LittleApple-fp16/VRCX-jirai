@@ -7,15 +7,36 @@ import { useAvatarProtectionSettingsStore } from '../stores/settings/avatarProte
 import { useUserStore } from '../stores/user';
 import { useNotificationStore } from '../stores/notification';
 
+import * as workerTimers from 'worker-timers';
+
 let _isProtectionSwitching = false;
 
 export function isProtectionSwitching() {
     return _isProtectionSwitching;
 }
 
-export function checkAvatarProtection(locationTag) {
+function desktopNotification(title, body) {
+    try {
+        if (typeof WINDOWS !== 'undefined' && WINDOWS) {
+            AppApi.DesktopNotification(title, body, '');
+        } else if (window.electron?.desktopNotification) {
+            window.electron.desktopNotification(title, body, '');
+        }
+    } catch (err) {
+        console.error('Avatar protection: desktop notification failed', err);
+    }
+}
+
+async function ensureSettings() {
     const settingsStore = useAvatarProtectionSettingsStore();
-    const userStore = useUserStore();
+    if (!settingsStore._initialized) {
+        await settingsStore.init();
+    }
+    return settingsStore;
+}
+
+export async function checkAvatarProtection(locationTag) {
+    const settingsStore = await ensureSettings();
 
     if (!settingsStore.enableAvatarProtection) {
         return;
@@ -32,6 +53,7 @@ export function checkAvatarProtection(locationTag) {
         return;
     }
 
+    const userStore = useUserStore();
     const currentAvatarId = userStore.currentUser.currentAvatar;
     if (!currentAvatarId) {
         return;
@@ -40,7 +62,7 @@ export function checkAvatarProtection(locationTag) {
         return;
     }
 
-    triggerProtection();
+    await triggerProtection();
 }
 
 async function triggerProtection() {
@@ -49,17 +71,37 @@ async function triggerProtection() {
     const notificationStore = useNotificationStore();
     const t = i18n.global.t;
 
+    const message = t('message.avatar_protection.triggered');
+
+    desktopNotification('Avatar Protection', message);
+
     const noty = {
         type: 'External',
         created_at: new Date().toJSON(),
-        message: t('message.avatar_protection.triggered', {
-            avatarName: userStore.currentUser.displayName || ''
-        })
+        message: message,
+        displayName: 'Avatar Protection'
     };
     notificationStore.playNoty(noty);
-    toast.warning(t('message.avatar_protection.triggered'));
+    toast.warning(message);
 
     await trySwitchAvatar();
+}
+
+function waitForAvatarChange(targetId, timeoutMs) {
+    const userStore = useUserStore();
+    return new Promise((resolve) => {
+        const start = Date.now();
+        function check() {
+            if (userStore.currentUser.currentAvatar === targetId) {
+                resolve(true);
+            } else if (Date.now() - start > timeoutMs) {
+                resolve(false);
+            } else {
+                workerTimers.setTimeout(check, 1000);
+            }
+        }
+        check();
+    });
 }
 
 async function trySwitchAvatar() {
@@ -67,43 +109,70 @@ async function trySwitchAvatar() {
     const userStore = useUserStore();
     const t = i18n.global.t;
 
-    if (settingsStore.fallbackAvatarId) {
-        if (settingsStore.protectedAvatarIds.includes(settingsStore.fallbackAvatarId)) {
-            toast.error(t('message.avatar_protection.fallback_is_protected'));
-            return;
-        }
-
-        _isProtectionSwitching = true;
-        try {
-            await avatarRequest.selectAvatar({ avatarId: settingsStore.fallbackAvatarId });
-            toast.success(t('message.avatar_protection.switched'));
-            return;
-        } catch (err) {
-            console.error('Avatar protection: fallback switch failed', err);
-        } finally {
-            _isProtectionSwitching = false;
-        }
+    const targetId = settingsStore.fallbackAvatarId || userStore.currentUser.fallbackAvatar;
+    if (!targetId) {
+        toast.error(t('message.avatar_protection.failed'));
+        return;
+    }
+    if (settingsStore.protectedAvatarIds.includes(targetId)) {
+        toast.error(t('message.avatar_protection.fallback_is_protected'));
+        return;
     }
 
-    if (userStore.currentUser.fallbackAvatar) {
-        _isProtectionSwitching = true;
-        try {
-            await avatarRequest.selectAvatar({ avatarId: userStore.currentUser.fallbackAvatar });
-            toast.success(t('message.avatar_protection.switched'));
-            return;
-        } catch (err) {
-            console.error('Avatar protection: VRChat fallback switch failed', err);
-        } finally {
-            _isProtectionSwitching = false;
+    _isProtectionSwitching = true;
+    let switched = false;
+    try {
+        for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+                await avatarRequest.selectAvatar({ avatarId: targetId });
+                const confirmed = await waitForAvatarChange(targetId, 10000);
+                if (confirmed) {
+                    switched = true;
+                    break;
+                }
+            } catch (err) {
+                console.error(`Avatar protection: switch attempt ${attempt + 1} failed`, err);
+            }
         }
-    }
 
-    toast.error(t('message.avatar_protection.failed'));
+        if (!switched && settingsStore.fallbackAvatarId && userStore.currentUser.fallbackAvatar && settingsStore.fallbackAvatarId !== userStore.currentUser.fallbackAvatar) {
+            const fallbackTarget = userStore.currentUser.fallbackAvatar;
+            if (!settingsStore.protectedAvatarIds.includes(fallbackTarget)) {
+                for (let attempt = 0; attempt < 2; attempt++) {
+                    try {
+                        await avatarRequest.selectAvatar({ avatarId: fallbackTarget });
+                        const confirmed = await waitForAvatarChange(fallbackTarget, 10000);
+                        if (confirmed) {
+                            switched = true;
+                            break;
+                        }
+                    } catch (err) {
+                        console.error(`Avatar protection: VRChat fallback attempt ${attempt + 1} failed`, err);
+                    }
+                }
+            }
+        }
+
+        if (switched) {
+            toast.success(t('message.avatar_protection.switched'));
+        } else {
+            toast.error(t('message.avatar_protection.failed'));
+        }
+    } finally {
+        _isProtectionSwitching = false;
+    }
 }
 
 export function initAvatarProtection() {
     const userStore = useUserStore();
     const settingsStore = useAvatarProtectionSettingsStore();
+
+    const currentLocation = userStore.currentUser.$locationTag;
+    if (currentLocation) {
+        workerTimers.setTimeout(() => {
+            checkAvatarProtection(currentLocation);
+        }, 5000);
+    }
 
     watch(
         () => userStore.currentUser.currentAvatar,

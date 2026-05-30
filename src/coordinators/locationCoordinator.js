@@ -82,6 +82,7 @@ export async function runSetCurrentUserLocationFlow(
 
     userStore.setCurrentUserLocationState(location, travelingToLocation);
     runUpdateCurrentUserLocationFlow();
+    checkAvatarProtection(location);
 
     // janky gameLog support for Quest
     if (gameStore.isGameRunning) {
@@ -128,8 +129,6 @@ export async function runSetCurrentUserLocationFlow(
         userStore.applyUserDialogLocation();
         instanceStore.applyWorldDialogInstances();
         instanceStore.applyGroupDialogInstances();
-
-        checkAvatarProtection(location);
     } else {
         locationStore.setLastLocation({
             ...locationStore.lastLocation,
